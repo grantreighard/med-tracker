@@ -44,6 +44,10 @@ export default function TrackerList(props) {
         localStorage.setItem("trackerList", null);
     }
 
+    const onlyUnique = (value, index, self) => {
+        return self.indexOf(value) === index;
+      }
+
     return (
         <div className="tracker-list">
             <form onSubmit={formSubmit}>
@@ -60,7 +64,7 @@ export default function TrackerList(props) {
                     placeholder="medication"  
                     onChange={(value) => setMedication(value)} 
                     required
-                    options={list.map(item => item.medication)}
+                    options={list.map(item => item.medication.trim()).filter(onlyUnique)}
                     trigger=""
                 />
                 <button type="submit">Add</button>
