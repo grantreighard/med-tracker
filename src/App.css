@@ -2,7 +2,7 @@
   min-width: 400px;
   max-width: 600px;
   margin: auto;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 html {
@@ -43,7 +43,7 @@ textarea {
 @media(max-width: 600px) {
   .App {
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-flow: column nowrap;
     align-items: center;

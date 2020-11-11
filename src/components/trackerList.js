@@ -46,7 +46,7 @@ export default function TrackerList(props) {
 
     const onlyUnique = (value, index, self) => {
         return self.indexOf(value) === index;
-      }
+    }
 
     return (
         <div className="tracker-list">
