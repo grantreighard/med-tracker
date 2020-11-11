@@ -1,38 +1,74 @@
 .App {
-  text-align: center;
+  min-width: 400px;
+  max-width: 600px;
+  margin: auto;
+  height: 100vh;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+html {
+  background-color: black;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+p, table, h1 {
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+h1 {
+  margin: auto;
+  min-width: 400px;
+  max-width: 600px;
+  text-align: center;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+input, button {
+  position: relative;
+  height: 25px;
+  border-radius: 3px;
+  border: 0px;
+  width: 100%;
+  margin: 10px auto;
+  background-color: white;
+}
+
+.rc-time-picker {
+  width: 101%;
+}
+
+textarea {
+  position: relative !important;
+  width: 99%;
+  border-radius: 3px;
+}
+
+@media(max-width: 600px) {
+  .App {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: flex-start;
   }
-  to {
-    transform: rotate(360deg);
-  }
+}
+
+.tracker-list {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+}
+
+form {
+  margin: auto;
+  width: 75%;
+}
+
+.warn-button {
+  background-color: rgb(249, 53, 53);
+  width: 75%;
+}
+
+.clear-button {
+  background-color: pink;
+  width: 75%;
 }
