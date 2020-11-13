@@ -220,7 +220,7 @@ export default function TrackerList(props) {
                 </tbody>
             </table>
             <button onClick={clearTable} className="warn-button">Clear table</button>
-            <p>Time since last dose</p>
+            {list.length && <p>Time since last dose</p>}
             <ul>
                 {list.map(item => item.medication.trim()).filter(onlyUnique).map(medication => {
                     return <li className="time-since">{medication}: {getTimeDifferenceBetweenNowAndLastDose(medication)}</li>
