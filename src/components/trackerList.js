@@ -9,7 +9,34 @@ import 'rc-time-picker/assets/index.css';
 import 'react-autocomplete-input/dist/bundle.css';
 
 export default function TrackerList(props) {
-    const [list, setList] = useState(JSON.parse(localStorage.getItem("trackerList")) || []);
+    const convertTimeTo24Hours = (timeWithAmOrPm) => {
+        const amOrPm = timeWithAmOrPm.split(" ")[1];
+        const time = timeWithAmOrPm.split(" ")[0];
+        if (amOrPm === "am") {
+            return time;
+        } else {
+            const timeArr = time.split(":");
+            const hours = timeArr[0];
+            const minutes = timeArr[1];
+            const seconds = timeArr[2];
+
+            return `${Number(hours)+12}:${minutes}:${seconds}`;
+        }
+    }
+
+    const sortList = (a, b) => {
+        const timeA = convertTimeTo24Hours(a.time);
+        const dateA = a.date.split("\"")[1].split("T")[0];
+        const dateObjA = new Date(`${dateA}T${timeA}`);
+
+        const timeB = convertTimeTo24Hours(b.time);
+        const dateB = b.date.split("\"")[1].split("T")[0];
+        const dateObjB = new Date(`${dateB}T${timeB}`);
+
+        return dateObjA - dateObjB < 0 ? 1 : -1;
+    }
+
+    const [list, setList] = useState(JSON.parse(localStorage.getItem("trackerList")).sort(sortList) || []);
     const [date, setDate] = useState(null);
     const [time, setTime] = useState(undefined);
     const [medication, setMedication] = useState("");
@@ -31,6 +58,7 @@ export default function TrackerList(props) {
 
         const newList = list.slice();
         newList.unshift(newObj);
+        newList.sort(sortList)
         localStorage.setItem("trackerList", JSON.stringify(newList));
         setList(newList);
     }
@@ -46,21 +74,6 @@ export default function TrackerList(props) {
 
     const onlyUnique = (value, index, self) => {
         return self.indexOf(value) === index;
-    }
-
-    const convertTimeTo24Hours = (timeWithAmOrPm) => {
-        const amOrPm = timeWithAmOrPm.split(" ")[1];
-        const time = timeWithAmOrPm.split(" ")[0];
-        if (amOrPm === "am") {
-            return time;
-        } else {
-            const timeArr = time.split(":");
-            const hours = timeArr[0];
-            const minutes = timeArr[1];
-            const seconds = timeArr[2];
-
-            return `${Number(hours)+12}:${minutes}:${seconds}`;
-        }
     }
 
     const formatTimeNicely = (numSeconds) => {
@@ -88,10 +101,10 @@ export default function TrackerList(props) {
         
         seconds = timeLeft;
         
-        return `${days > 0 ? days + "d " : ""} ${hours > 0 ? hours + "h " : ""} ${minutes > 0 ? minutes + "m " : ""} ${seconds > 0 ? seconds + "s" : ""}`
+        return `${days > 0 ? days + "d " : ""} ${hours > 0 ? hours + "h " : ""} ${minutes > 0 ? minutes + "m " : ""} ${seconds > 0 ? Math.round(seconds) + "s" : ""}`
     }
 
-    const getTimeDifference = (medication, index) => {
+    const getTimeDifferenceBetweenDoses = (medication, index) => {
         const currentDate = list[index].date.split("\"")[1].split("T")[0];
         const currentTime = convertTimeTo24Hours(list[index].time);
         const currentDateObj = new Date(`${currentDate}T${currentTime}`);
@@ -110,10 +123,50 @@ export default function TrackerList(props) {
 
             const differenceInMilliseconds = currentDateObj - foundDateObj;
             const seconds = differenceInMilliseconds / 1000;
-            return formatTimeNicely(seconds);
+            if (seconds > 0) {
+                return formatTimeNicely(seconds);
+            } else if (seconds === 0) {
+                return 'same time'
+            }
+            
         } else {
             return 'no prior record'
         }
+    }
+
+    const getTimeDifferenceBetweenNowAndLastDose = (medication) => {
+        const nowDateObj = new Date();
+
+        let foundIndex = -1;
+        for (let i = 0; i < list.length; i++) {
+            if (list[i].medication.trim() === medication.trim()) {
+                foundIndex = i;
+                break;
+            }
+        }
+
+        if (foundIndex >= 0) {
+            const foundDate = list[foundIndex].date.split("\"")[1].split("T")[0];
+            const foundTime = convertTimeTo24Hours(list[foundIndex].time);
+            const foundDateObj = new Date(`${foundDate}T${foundTime}`);
+
+            const differenceInMilliseconds = nowDateObj - foundDateObj;
+            const seconds = differenceInMilliseconds / 1000;
+            if (seconds >= 0) {
+                return formatTimeNicely(seconds);
+            } else {
+                return "time is in future"
+            }
+            
+        }
+    }
+
+    const removeItem = (index) => {
+        console.log(index)
+        const newList = list.slice();
+        newList.splice(index, 1);
+        setList(newList);
+        localStorage.setItem("trackerList", JSON.stringify(newList));
     }
 
     return (
@@ -146,6 +199,7 @@ export default function TrackerList(props) {
                         <th>Time</th>
                         <th>Medication</th>
                         <th>Time Apart</th>
+                        <th>Remove</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -159,13 +213,20 @@ export default function TrackerList(props) {
                             <td>{date ? `${date.split("-")[1]}/${date.split("-")[2]}/${date.split("-")[0]}`: null}</td>
                             <td>{item.time ? item.time : null}</td>
                             <td>{item.medication ? item.medication : null}</td>
-                            <td>{getTimeDifference(item.medication, i)}</td>
+                            <td>{getTimeDifferenceBetweenDoses(item.medication, i)}</td>
+                            <td><button className="remove-button" onClick={() => removeItem(i)}>x</button></td>
                         </tr>
                     })}
                 </tbody>
             </table>
             <button onClick={clearTable} className="warn-button">Clear table</button>
-            <p>Copyright &copy; {new Date().getFullYear()} Reighard Enterprises.</p>
+            <p>Time since last dose</p>
+            <ul>
+                {list.map(item => item.medication.trim()).filter(onlyUnique).map(medication => {
+                    return <li className="time-since">{medication}: {getTimeDifferenceBetweenNowAndLastDose(medication)}</li>
+                })}
+            </ul>
+            <p>Copyright &copy; {new Date().getFullYear()} Reighard Enterprises</p>
             <Twitter link="https://www.popmypills.com" name="Share on Twitter" message="Check out this free medication tracker that you can save as a bookmark to your phone." label={serviceName => serviceName} />
         </div>
     )

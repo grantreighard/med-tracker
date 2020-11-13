@@ -5,11 +5,16 @@
   min-height: 100vh;
 }
 
+.explainer {
+  width: 450px;
+  margin: 0 auto;
+}
+
 html {
   background-color: black;
 }
 
-p, table, h1 {
+p, table, h1, li.time-since {
   color: white;
 }
 
@@ -75,4 +80,8 @@ form {
 
 a {
   color: dodgerblue;
+}
+
+.remove-button {
+  width: 20px;
 }
