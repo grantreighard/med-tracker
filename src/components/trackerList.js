@@ -7,6 +7,7 @@ import { Twitter } from 'react-social-sharing';
 import 'js-datepicker/dist/datepicker.min.css'
 import 'rc-time-picker/assets/index.css';
 import 'react-autocomplete-input/dist/bundle.css';
+import ConfirmationModal from './confirmationModal';
 
 export default function TrackerList(props) {
     const convertTimeTo24Hours = (timeWithAmOrPm) => {
@@ -40,6 +41,8 @@ export default function TrackerList(props) {
     const [date, setDate] = useState(null);
     const [time, setTime] = useState(undefined);
     const [medication, setMedication] = useState("");
+    const [showModal, setShowModal] = useState(false);
+    const [modalIndex, setModalIndex] = useState(0);
 
     useEffect(() => {
         const picker = datepicker(".date-picker", {
@@ -162,15 +165,21 @@ export default function TrackerList(props) {
     }
 
     const removeItem = (index) => {
-        console.log(index)
         const newList = list.slice();
         newList.splice(index, 1);
         setList(newList);
         localStorage.setItem("trackerList", JSON.stringify(newList));
+        setShowModal(false);
+    }
+
+    const showThatModal = (index) => {
+        setShowModal(true);
+        setModalIndex(index);
     }
 
     return (
         <div className="tracker-list">
+            <ConfirmationModal isShown={showModal} yesFn={() => removeItem(modalIndex)} noFn={() => setShowModal(false)} />
             <form onSubmit={formSubmit}>
                 <input type="text" className="date-picker" placeholder="date" value={date} onChange={(e) => console.log(e)} required />
                 <TimePicker 
@@ -214,7 +223,7 @@ export default function TrackerList(props) {
                             <td>{item.time ? item.time : null}</td>
                             <td>{item.medication ? item.medication : null}</td>
                             <td>{getTimeDifferenceBetweenDoses(item.medication, i)}</td>
-                            <td><button className="remove-button" onClick={() => removeItem(i)}>x</button></td>
+                            <td><button className="remove-button" onClick={() => showThatModal(i)}>x</button></td>
                         </tr>
                     })}
                 </tbody>

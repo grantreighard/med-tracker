@@ -85,3 +85,19 @@ a {
 .remove-button {
   width: 20px;
 }
+
+.confirmation-modal {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.8);
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.confirmation-modal button {
+  width: 300px;
+}
