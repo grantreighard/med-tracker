@@ -36,7 +36,7 @@ export default function TrackerList(props) {
         return dateObjA - dateObjB < 0 ? 1 : -1;
     }
 
-    const [list, setList] = useState(JSON.parse(localStorage.getItem("trackerList")).sort(sortList) || []);
+    const [list, setList] = useState(JSON.parse(localStorage.getItem("trackerList")) ? JSON.parse(localStorage.getItem("trackerList")).sort(sortList) : []);
     const [date, setDate] = useState(null);
     const [time, setTime] = useState(undefined);
     const [medication, setMedication] = useState("");
