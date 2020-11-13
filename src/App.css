@@ -19,7 +19,7 @@ p, table, h1, li.time-since {
 }
 
 h1 {
-  margin: auto;
+  margin: 20px auto;
   min-width: 400px;
   max-width: 600px;
   text-align: center;
