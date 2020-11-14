@@ -194,7 +194,7 @@ export default function TrackerList(props) {
                     use12Hours
                     required
                 />
-                <p>This field makes auto-complete suggestions based on medication names in the table below.</p>
+                <p>This field makes auto-complete suggestions based on medication names in the table(s) below.</p>
                 <TextInput 
                     type="text" 
                     placeholder="medication"  
