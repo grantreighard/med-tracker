@@ -4,6 +4,7 @@ import TimePicker from 'rc-time-picker';
 import moment from 'moment';    
 import TextInput from 'react-autocomplete-input';
 import { Twitter } from 'react-social-sharing';
+import dayOfWeek from 'dayofweek';
 import 'js-datepicker/dist/datepicker.min.css'
 import 'rc-time-picker/assets/index.css';
 import 'react-autocomplete-input/dist/bundle.css';
@@ -42,6 +43,8 @@ export default function TrackerList(props) {
     const [medication, setMedication] = useState("");
     const [showModal, setShowModal] = useState(false);
     const [modalIndex, setModalIndex] = useState(0);
+
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
     useEffect(() => {
         const picker = datepicker(".date-picker", {
@@ -176,6 +179,10 @@ export default function TrackerList(props) {
         setModalIndex(index);
     }
 
+    const getIndexFromFullList = (item) => {
+        return list.indexOf(item)
+    }
+
     return (
         <div className="tracker-list">
             <ConfirmationModal isShown={showModal} yesFn={() => removeItem(modalIndex)} noFn={() => setShowModal(false)} />
@@ -187,7 +194,7 @@ export default function TrackerList(props) {
                     use12Hours
                     required
                 />
-                <p>This field auto-completes based on medication names in the table below.</p>
+                <p>This field makes auto-complete suggestions based on medication names in the table below.</p>
                 <TextInput 
                     type="text" 
                     placeholder="medication"  
@@ -199,35 +206,43 @@ export default function TrackerList(props) {
                 <button type="submit">Add</button>
             </form>
 
-            <button onClick={clearForm} className="clear-button">Clear form</button>
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Medication</th>
-                        <th>Time Apart</th>
-                        <th>Remove</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {list && list.map((item, i) => {
-                        let date;
-                        if (item.date) {
-                            date = item.date.split("\"")[1].split("T")[0];
-                        }
+            <button onClick={clearForm} className="clear-button">Clear form/refresh</button>
 
-                        return <tr>
-                            <td>{date ? `${date.split("-")[1]}/${date.split("-")[2]}/${date.split("-")[0]}`: null}</td>
-                            <td>{item.time ? item.time : null}</td>
-                            <td>{item.medication ? item.medication : null}</td>
-                            <td>{getTimeDifferenceBetweenDoses(item.medication, i)}</td>
-                            <td><button className="remove-button" onClick={() => showThatModal(i)}>x</button></td>
-                        </tr>
-                    })}
-                </tbody>
-            </table>
-            <button onClick={clearTable} className="warn-button">Clear table</button>
+            {list.map(item => item.date.split("\"")[1].split("T")[0]).filter(onlyUnique).map(date => {
+                return <div>
+                    <p>Medication for {dayOfWeek(Number(date.split("-")[0]), Number(date.split("-")[1]), Number(date.split("-")[2]))},&nbsp;
+                        {`${months[Number(date.split("-")[1])-1]} ${date.split("-")[2]}, ${date.split("-")[0]}`}:</p>
+                    <table border="1">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Medication</th>
+                                <th>Time Apart</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {list && list.filter(item => item.date.split("\"")[1].split("T")[0] === date).map((item, i) => {
+                                let date;
+                                if (item.date) {
+                                    date = item.date.split("\"")[1].split("T")[0];
+                                }
+
+                                return <tr>
+                                    <td>{date ? `${date.split("-")[1]}/${date.split("-")[2]}/${date.split("-")[0]}`: null}</td>
+                                    <td>{item.time ? item.time : null}</td>
+                                    <td>{item.medication ? item.medication : null}</td>
+                                    <td>{getTimeDifferenceBetweenDoses(item.medication, getIndexFromFullList(item))}</td>
+                                    <td><button className="remove-button" onClick={() => showThatModal(i)}>x</button></td>
+                                </tr>
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            })}
+            
+            <button onClick={clearTable} className="warn-button">Clear all tables (irreversible)</button>
             {list.length && <p>Time since last dose</p>}
             <ul>
                 {list.map(item => item.medication.trim()).filter(onlyUnique).map(medication => {
