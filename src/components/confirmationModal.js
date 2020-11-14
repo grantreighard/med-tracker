@@ -3,7 +3,7 @@ import { useScrollPosition } from '@n8tb1t/use-scroll-position'
 
 export default function ConfirmationModal(props) {
     const [scrollY, setScrollY] = useState(0);
-    useScrollPosition(({ prevPos, currPos }) => {
+    useScrollPosition(({ currPos }) => {
         setScrollY(currPos.y);
     })
 

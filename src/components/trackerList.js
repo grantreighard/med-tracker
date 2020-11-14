@@ -13,15 +13,14 @@ export default function TrackerList(props) {
     const convertTimeTo24Hours = (timeWithAmOrPm) => {
         const amOrPm = timeWithAmOrPm.split(" ")[1];
         const time = timeWithAmOrPm.split(" ")[0];
+        const timeArr = time.split(":");
+        const hours = timeArr[0];
+        const minutes = timeArr[1];
+        const seconds = timeArr[2];
         if (amOrPm === "am") {
-            return time;
+            return Number(hours) !== 12 ? time : `00:${minutes}:${seconds}`;
         } else {
-            const timeArr = time.split(":");
-            const hours = timeArr[0];
-            const minutes = timeArr[1];
-            const seconds = timeArr[2];
-
-            return `${Number(hours)+12}:${minutes}:${seconds}`;
+            return Number(hours) !== 12 ? `${Number(hours)+12}:${minutes}:${seconds}` : `${hours}:${minutes}:${seconds}`;
         }
     }
 
@@ -130,8 +129,7 @@ export default function TrackerList(props) {
                 return formatTimeNicely(seconds);
             } else if (seconds === 0) {
                 return 'same time'
-            }
-            
+            } 
         } else {
             return 'no prior record'
         }
@@ -155,12 +153,13 @@ export default function TrackerList(props) {
 
             const differenceInMilliseconds = nowDateObj - foundDateObj;
             const seconds = differenceInMilliseconds / 1000;
-            if (seconds >= 0) {
+            if (seconds > 0) {
                 return formatTimeNicely(seconds);
+            } else if (seconds === 0) {
+                return 'now'
             } else {
                 return "time is in future"
             }
-            
         }
     }
 
