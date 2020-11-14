@@ -223,18 +223,18 @@ export default function TrackerList(props) {
                             </tr>
                         </thead>
                         <tbody>
-                            {list && list.filter(item => item.date.split("\"")[1].split("T")[0] === date).map((item, i) => {
-                                let date;
+                            {list && list.filter(item => item.date.split("\"")[1].split("T")[0] === date).map((item) => {
+                                let date1;
                                 if (item.date) {
-                                    date = item.date.split("\"")[1].split("T")[0];
+                                    date1 = item.date.split("\"")[1].split("T")[0];
                                 }
 
                                 return <tr>
-                                    <td>{date ? `${date.split("-")[1]}/${date.split("-")[2]}/${date.split("-")[0]}`: null}</td>
+                                    <td>{date1 ? `${date1.split("-")[1]}/${date1.split("-")[2]}/${date1.split("-")[0]}`: null}</td>
                                     <td>{item.time ? item.time : null}</td>
                                     <td>{item.medication ? item.medication : null}</td>
                                     <td>{getTimeDifferenceBetweenDoses(item.medication, getIndexFromFullList(item))}</td>
-                                    <td><button className="remove-button" onClick={() => showThatModal(i)}>x</button></td>
+                                    <td><button className="remove-button" onClick={() => showThatModal(getIndexFromFullList(item))}>x</button></td>
                                 </tr>
                             })}
                         </tbody>
