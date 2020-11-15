@@ -68,7 +68,7 @@ export default function TrackerList(props) {
         setList(newList);
     }
 
-    const clearForm = () => {
+    const refresh = () => {
         window.location.reload(false);
     }
 
@@ -187,12 +187,13 @@ export default function TrackerList(props) {
         <div className="tracker-list">
             <ConfirmationModal isShown={showModal} yesFn={() => removeItem(modalIndex)} noFn={() => setShowModal(false)} />
             <form onSubmit={formSubmit}>
-                <input type="text" className="date-picker" placeholder="date" value={date} onChange={(e) => console.log(e)} required />
+                <input type="date" className="date-picker" placeholder="date" value={date} onChange={(e) => console.log(e)} required />
                 <TimePicker 
                     placeholder="time" 
                     onChange={(value) => value ? setTime(moment(value._d).format("hh:mm:ss a")) : setTime(undefined)} 
                     use12Hours
                     required
+                    type="time"
                 />
                 <p>This field makes auto-complete suggestions based on medication names in the table(s) below.</p>
                 <TextInput 
@@ -206,7 +207,7 @@ export default function TrackerList(props) {
                 <button type="submit">Add</button>
             </form>
 
-            <button onClick={clearForm} className="clear-button">Clear form/refresh</button>
+            <button onClick={refresh} className="clear-button">Clear form</button>
 
             {list.map(item => item.date.split("\"")[1].split("T")[0]).filter(onlyUnique).map(date => {
                 return <div>
@@ -249,6 +250,7 @@ export default function TrackerList(props) {
                     return <li className="time-since">{medication}: {getTimeDifferenceBetweenNowAndLastDose(medication)}</li>
                 })}
             </ul>
+            <button onClick={refresh} className="clear-button">Refresh</button>
             <p>Copyright &copy; {new Date().getFullYear()} Reighard Enterprises</p>
             <Twitter link="https://www.popmypills.com" name="Share on Twitter" message="Check out this free medication tracker that you can save as a bookmark to your phone." label={serviceName => serviceName} />
         </div>
