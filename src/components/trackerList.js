@@ -187,13 +187,12 @@ export default function TrackerList(props) {
         <div className="tracker-list">
             <ConfirmationModal isShown={showModal} yesFn={() => removeItem(modalIndex)} noFn={() => setShowModal(false)} />
             <form onSubmit={formSubmit}>
-                <input type="date" className="date-picker" placeholder="date" value={date} onChange={(e) => console.log(e)} required />
+                <input type="text" className="date-picker" placeholder="date" value={date} onChange={(e) => console.log(e)} required />
                 <TimePicker 
                     placeholder="time" 
                     onChange={(value) => value ? setTime(moment(value._d).format("hh:mm:ss a")) : setTime(undefined)} 
                     use12Hours
                     required
-                    type="time"
                 />
                 <p>This field makes auto-complete suggestions based on medication names in the table(s) below.</p>
                 <TextInput 
