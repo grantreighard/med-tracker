@@ -50,6 +50,8 @@ export default function TrackerList(props) {
         const picker = datepicker(".date-picker", {
             onSelect: (instance, date) => {setDate(date)}
         })
+
+        setCurrentDateAndTime();
     }, [])
 
     const formSubmit = (e) => {
@@ -57,7 +59,7 @@ export default function TrackerList(props) {
 
         const newObj = {
             date: JSON.stringify(date),
-            time,
+            time: time.format("hh:mm:ss a"),
             medication
         }
 
@@ -183,75 +185,87 @@ export default function TrackerList(props) {
         return list.indexOf(item)
     }
 
+    const setCurrentDateAndTime = () => {
+        setDate(new Date());
+        setTime(moment());
+    }
+
     return (
         <div className="tracker-list">
-            <ConfirmationModal isShown={showModal} yesFn={() => removeItem(modalIndex)} noFn={() => setShowModal(false)} />
-            <form onSubmit={formSubmit}>
-                <input type="text" className="date-picker" placeholder="date" value={date} onChange={(e) => console.log(e)} required />
-                <TimePicker 
-                    placeholder="time" 
-                    onChange={(value) => value ? setTime(moment(value._d).format("hh:mm:ss a")) : setTime(undefined)} 
-                    use12Hours
-                    required
-                />
-                <p>This field makes auto-complete suggestions based on medication names in the table(s) below.</p>
-                <TextInput 
-                    type="text" 
-                    placeholder="medication"  
-                    onChange={(value) => setMedication(value)} 
-                    required
-                    options={list.map(item => item.medication.trim()).filter(onlyUnique)}
-                    trigger=""
-                />
-                <button type="submit">Add</button>
-            </form>
+            <div className="app-section">
+                <h2>Form</h2>
+                <ConfirmationModal isShown={showModal} yesFn={() => removeItem(modalIndex)} noFn={() => setShowModal(false)} />
+                <form onSubmit={formSubmit}>
+                    <input type="text" className="date-picker" placeholder="date" value={date ? date : new Date()} onChange={(e) => console.log(e)} required />
+                    <TimePicker 
+                        placeholder="time" 
+                        onChange={(value) => value ? setTime(moment(value._d)) : setTime(undefined)} 
+                        use12Hours
+                        required
+                        value={time ? time : moment()}
+                    />
+                    <button onClick={setCurrentDateAndTime} type="button">Fill current date and time</button>
+                    <p>This field makes auto-complete suggestions based on medication names in the table(s) below.</p>
+                    <TextInput 
+                        type="text" 
+                        placeholder="medication"  
+                        onChange={(value) => setMedication(value)} 
+                        required
+                        options={list.map(item => item.medication.trim()).filter(onlyUnique)}
+                        trigger=""
+                    />
+                    <button type="submit">Add</button>
+                </form>
 
-            <button onClick={refresh} className="clear-button">Clear form</button>
-
-            {list.map(item => item.date.split("\"")[1].split("T")[0]).filter(onlyUnique).map(date => {
-                return <div>
-                    <p>Medication for {dayOfWeek(Number(date.split("-")[0]), Number(date.split("-")[1]), Number(date.split("-")[2]))},&nbsp;
-                        {`${months[Number(date.split("-")[1])-1]} ${date.split("-")[2]}, ${date.split("-")[0]}`}:</p>
-                    <table border="1">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Medication</th>
-                                <th>Time Apart</th>
-                                <th>Remove</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {list && list.filter(item => item.date.split("\"")[1].split("T")[0] === date).map((item) => {
-                                let date1;
-                                if (item.date) {
-                                    date1 = item.date.split("\"")[1].split("T")[0];
-                                }
-
-                                return <tr>
-                                    <td>{date1 ? `${date1.split("-")[1]}/${date1.split("-")[2]}/${date1.split("-")[0]}`: null}</td>
-                                    <td>{item.time ? item.time : null}</td>
-                                    <td>{item.medication ? item.medication : null}</td>
-                                    <td>{getTimeDifferenceBetweenDoses(item.medication, getIndexFromFullList(item))}</td>
-                                    <td><button className="remove-button" onClick={() => showThatModal(getIndexFromFullList(item))}>x</button></td>
+                <button onClick={refresh} className="clear-button">Clear form</button>
+            </div>
+            <div className="app-section">
+                <h2>Tracker</h2>
+                {list.map(item => item.date.split("\"")[1].split("T")[0]).filter(onlyUnique).map(date => {
+                    return <div>
+                        <p>Medication for {dayOfWeek(Number(date.split("-")[0]), Number(date.split("-")[1]), Number(date.split("-")[2]))},&nbsp;
+                            {`${months[Number(date.split("-")[1])-1]} ${date.split("-")[2]}, ${date.split("-")[0]}`}:</p>
+                        <table border="1">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Medication</th>
+                                    <th>Time Apart</th>
+                                    <th>Remove</th>
                                 </tr>
-                            })}
-                        </tbody>
-                    </table>
-                </div>
-            })}
-            
-            <button onClick={clearTable} className="warn-button">Clear all tables (irreversible)</button>
-            {list.length && <p>Time since last dose</p>}
-            <ul>
-                {list.map(item => item.medication.trim()).filter(onlyUnique).map(medication => {
-                    return <li className="time-since">{medication}: {getTimeDifferenceBetweenNowAndLastDose(medication)}</li>
+                            </thead>
+                            <tbody>
+                                {list && list.filter(item => item.date.split("\"")[1].split("T")[0] === date).map((item) => {
+                                    let date1;
+                                    if (item.date) {
+                                        date1 = item.date.split("\"")[1].split("T")[0];
+                                    }
+
+                                    return <tr>
+                                        <td>{date1 ? `${date1.split("-")[1]}/${date1.split("-")[2]}/${date1.split("-")[0]}`: null}</td>
+                                        <td>{item.time ? item.time : null}</td>
+                                        <td>{item.medication ? item.medication : null}</td>
+                                        <td>{getTimeDifferenceBetweenDoses(item.medication, getIndexFromFullList(item))}</td>
+                                        <td><button className="remove-button" onClick={() => showThatModal(getIndexFromFullList(item))}>x</button></td>
+                                    </tr>
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 })}
-            </ul>
-            <button onClick={refresh} className="clear-button">Refresh</button>
-            <p>Copyright &copy; {new Date().getFullYear()} Reighard Enterprises</p>
-            <Twitter link="https://www.popmypills.com" name="Share on Twitter" message="Check out this free medication tracker that you can save as a bookmark to your phone." label={serviceName => serviceName} />
+            
+                <button onClick={clearTable} className="warn-button">Clear all tables (irreversible)</button>
+                {list.length && <p>Time since last dose</p>}
+                <ul>
+                    {list.map(item => item.medication.trim()).filter(onlyUnique).map(medication => {
+                        return <li className="time-since">{medication}: {getTimeDifferenceBetweenNowAndLastDose(medication)}</li>
+                    })}
+                </ul>
+                <button onClick={refresh} className="clear-button">Refresh</button>
+            </div>
+            <p className="copyright">Copyright &copy; {new Date().getFullYear()} Reighard Enterprises</p>
+            <Twitter link="https://www.simplemedicationtracker.com" name="Share on Twitter" message="Check out this free medication tracker that you can save as a bookmark to your phone." label={serviceName => serviceName} />
         </div>
     )
 }
