@@ -48,7 +48,11 @@ export default function TrackerList(props) {
 
     useEffect(() => {
         const picker = datepicker(".date-picker", {
-            onSelect: (instance, date) => {setDate(date)}
+            onSelect: (instance, date) => {setDate(date)},
+            formatter: (input, date, instance) => {
+                const value = date.toLocaleDateString()
+                input.value = value // => '1/1/2099'
+            }
         })
 
         setCurrentDateAndTime();
@@ -186,7 +190,12 @@ export default function TrackerList(props) {
     }
 
     const setCurrentDateAndTime = () => {
-        setDate(new Date());
+        const newDate = new Date();
+        newDate.setHours(0);
+        newDate.setMinutes(0);
+        newDate.setSeconds(0);
+        newDate.setMilliseconds(0);
+        setDate(newDate);
         setTime(moment());
     }
 
@@ -256,10 +265,10 @@ export default function TrackerList(props) {
                 })}
             
                 <button onClick={clearTable} className="warn-button">Clear all tables (irreversible)</button>
-                {list.length && <p>Time since last dose</p>}
+                {list.length && <p>Time since last dose and dose(s) total</p>}
                 <ul>
                     {list.map(item => item.medication.trim()).filter(onlyUnique).map(medication => {
-                        return <li className="time-since">{medication}: {getTimeDifferenceBetweenNowAndLastDose(medication)}</li>
+                        return <li className="time-since">{medication}: {getTimeDifferenceBetweenNowAndLastDose(medication)} - {list.filter(item => item.medication.trim() === medication.trim()).length} dose(s) total</li>
                     })}
                 </ul>
                 <button onClick={refresh} className="clear-button">Refresh</button>
