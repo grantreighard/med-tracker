@@ -50,17 +50,6 @@ textarea {
   border-radius: 3px;
 }
 
-@media(max-width: 600px) {
-  .App {
-    width: 100vw;
-    min-height: 100vh;
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: center;
-    justify-content: flex-start;
-  }
-}
-
 .tracker-list {
   display: flex;
   flex-flow: column nowrap;
@@ -121,4 +110,19 @@ a {
 
 .copyright {
   color: white;
+}
+
+@media(max-width: 600px) {
+  .App {
+    width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .app-section {
+    width: 100%;
+  }
 }
