@@ -123,10 +123,10 @@ a {
   }
 
   .app-section {
-    width: 95%;
+    width: 100vw;
   }
 
   table {
-    width: 95%;
+    width: 100vw;
   }
 }
